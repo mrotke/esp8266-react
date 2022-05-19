@@ -1,4 +1,5 @@
 #include <LightMqttSettingsService.h>
+#ifndef LINUX
 
 LightMqttSettingsService::LightMqttSettingsService(AsyncWebServer* server, FS* fs, SecurityManager* securityManager) :
     _httpEndpoint(LightMqttSettings::read,
@@ -14,3 +15,4 @@ LightMqttSettingsService::LightMqttSettingsService(AsyncWebServer* server, FS* f
 void LightMqttSettingsService::begin() {
   _fsPersistence.readFromFS();
 }
+#endif

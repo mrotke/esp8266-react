@@ -1,11 +1,12 @@
 #ifndef LightStateService_h
 #define LightStateService_h
 
-#include <LightMqttSettingsService.h>
-
 #include <HttpEndpoint.h>
+
+#ifndef LINUX
 #include <MqttPubSub.h>
 #include <WebSocketTxRx.h>
+#endif
 
 #define LED_PIN 2
 
@@ -68,18 +69,22 @@ class LightState {
 class LightStateService : public StatefulService<LightState> {
  public:
   LightStateService(AsyncWebServer* server,
-                    SecurityManager* securityManager,
-                    AsyncMqttClient* mqttClient,
-                    LightMqttSettingsService* lightMqttSettingsService);
+                    SecurityManager* securityManager
+                    #ifndef LINUX
+                    ,AsyncMqttClient* mqttClient,
+                    LightMqttSettingsService* lightMqttSettingsService
+                    #endif
+                    );
   void begin();
 
  private:
   HttpEndpoint<LightState> _httpEndpoint;
+#ifndef LINUX
   MqttPubSub<LightState> _mqttPubSub;
   WebSocketTxRx<LightState> _webSocket;
   AsyncMqttClient* _mqttClient;
   LightMqttSettingsService* _lightMqttSettingsService;
-
+#endif
   void registerConfig();
   void onConfigUpdated();
 };

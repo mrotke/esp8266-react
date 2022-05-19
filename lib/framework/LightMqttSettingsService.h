@@ -1,6 +1,8 @@
 #ifndef LightMqttSettingsService_h
 #define LightMqttSettingsService_h
 
+#ifndef LINUX
+
 #include <HttpEndpoint.h>
 #include <FSPersistence.h>
 #include <SettingValue.h>
@@ -38,4 +40,5 @@ class LightMqttSettingsService : public StatefulService<LightMqttSettings> {
   FSPersistence<LightMqttSettings> _fsPersistence;
 };
 
+#endif // end LINUX
 #endif  // end LightMqttSettingsService_h

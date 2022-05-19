@@ -10,6 +10,10 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #endif
+#ifdef LINUX
+#include <mutex>
+#endif
+
 
 #ifndef DEFAULT_BUFFER_SIZE
 #define DEFAULT_BUFFER_SIZE 1024
@@ -130,17 +134,26 @@ class StatefulService {
 #ifdef ESP32
     xSemaphoreTakeRecursive(_accessMutex, portMAX_DELAY);
 #endif
+#ifdef LINUX
+    _accessMutex.lock();
+#endif
   }
 
   inline void endTransaction() {
 #ifdef ESP32
     xSemaphoreGiveRecursive(_accessMutex);
 #endif
+#ifdef LINUX
+    _accessMutex.unlock();
+#endif
   }
 
  private:
 #ifdef ESP32
   SemaphoreHandle_t _accessMutex;
+#endif
+#ifdef LINUX
+  std::recursive_mutex> _accessMutex;
 #endif
   std::list<StateUpdateHandlerInfo_t> _updateHandlers;
 };

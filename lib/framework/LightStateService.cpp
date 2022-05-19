@@ -2,8 +2,11 @@
 
 LightStateService::LightStateService(AsyncWebServer* server,
                                      SecurityManager* securityManager,
+                                     #ifndef LINUX
                                      AsyncMqttClient* mqttClient,
-                                     LightMqttSettingsService* lightMqttSettingsService) :
+                                     LightMqttSettingsService* lightMqttSettingsService
+                                     #endif
+                                     ) :
     _httpEndpoint(LightState::read,
                   LightState::update,
                   this,
@@ -11,6 +14,7 @@ LightStateService::LightStateService(AsyncWebServer* server,
                   LIGHT_SETTINGS_ENDPOINT_PATH,
                   securityManager,
                   AuthenticationPredicates::IS_AUTHENTICATED),
+    #ifndef LINUX
     _mqttPubSub(LightState::haRead, LightState::haUpdate, this, mqttClient),
     _webSocket(LightState::read,
                LightState::update,
@@ -20,16 +24,19 @@ LightStateService::LightStateService(AsyncWebServer* server,
                securityManager,
                AuthenticationPredicates::IS_AUTHENTICATED),
     _mqttClient(mqttClient),
-    _lightMqttSettingsService(lightMqttSettingsService) {
+    _lightMqttSettingsService(lightMqttSettingsService) 
+    #endif
+  {
   // configure led to be output
   pinMode(LED_PIN, OUTPUT);
 
+#ifndef LINUX
   // configure MQTT callback
   _mqttClient->onConnect(std::bind(&LightStateService::registerConfig, this));
 
   // configure update handler for when the light settings change
   _lightMqttSettingsService->addUpdateHandler([&](const String& originId) { registerConfig(); }, false);
-
+#endif
   // configure settings service update handler to update LED state
   addUpdateHandler([&](const String& originId) { onConfigUpdated(); }, false);
 }
@@ -44,6 +51,7 @@ void LightStateService::onConfigUpdated() {
 }
 
 void LightStateService::registerConfig() {
+  #ifndef LINUX
   if (!_mqttClient->connected()) {
     return;
   }
@@ -70,4 +78,5 @@ void LightStateService::registerConfig() {
   _mqttClient->publish(configTopic.c_str(), 0, false, payload.c_str());
 
   _mqttPubSub.configureTopics(pubTopic, subTopic);
+  #endif
 }
