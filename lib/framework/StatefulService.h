@@ -153,7 +153,7 @@ class StatefulService {
   SemaphoreHandle_t _accessMutex;
 #endif
 #ifdef LINUX
-  std::recursive_mutex> _accessMutex;
+  std::recursive_mutex _accessMutex;
 #endif
   std::list<StateUpdateHandlerInfo_t> _updateHandlers;
 };
