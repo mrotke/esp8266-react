@@ -1,7 +1,6 @@
 #include <ArduinoFake.h>
 #include <unity.h>
 #include <LightStateService.h>
-#include <IPAddress.h>
 
 using namespace fakeit;
 
