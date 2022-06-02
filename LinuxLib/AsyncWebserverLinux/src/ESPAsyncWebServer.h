@@ -1,3 +1,6 @@
+#ifndef _ESPAsyncWebServer_H_
+#define _ESPAsyncWebServer_H_
+
 #include <functional>
 #include <ArduinoJson.h>
 
@@ -14,3 +17,5 @@ class AsyncWebServerRequest {
 typedef std::function<bool(AsyncWebServerRequest *request)> ArRequestFilterFunction;
 typedef std::function<void(AsyncWebServerRequest *request, JsonVariant &json)> ArJsonRequestHandlerFunction;
 typedef std::function<void(AsyncWebServerRequest *request)> ArRequestHandlerFunction;
+
+#endif
