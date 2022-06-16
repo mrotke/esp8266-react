@@ -34,7 +34,8 @@ class AsyncWebServer {
 public:
     AsyncWebServer();
     AsyncWebServer(uint16_t port);
-    on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
+    void begin();
+    void on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
 private:
     webserver ws;
 };
