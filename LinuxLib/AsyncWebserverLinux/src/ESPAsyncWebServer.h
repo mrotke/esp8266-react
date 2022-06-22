@@ -4,6 +4,8 @@
 #include <functional>
 #include <ArduinoJson.h>
 #include <httpserver.hpp>
+#include <vector>
+#include <memory>
 
 using namespace httpserver;
 
@@ -20,8 +22,13 @@ typedef enum {
 
 typedef uint8_t WebRequestMethodComposite;
 
-class AsyncWebServerRequest {
+class AsyncWebServerResponse {
+  public:
+  void setLength() {}; //TODO
+  JsonVariant getRoot() {return NULL;}; //TODO
 };
+
+class AsyncWebServerRequest;
 /*
  * FILTER :: Callback to filter AsyncWebRewrite and AsyncWebHandler (done by the Server)
  * */
@@ -30,6 +37,17 @@ typedef std::function<bool(AsyncWebServerRequest *request)> ArRequestFilterFunct
 typedef std::function<void(AsyncWebServerRequest *request, JsonVariant &json)> ArJsonRequestHandlerFunction;
 typedef std::function<void(AsyncWebServerRequest *request)> ArRequestHandlerFunction;
 
+
+class AsyncWebServerRequest : public http_resource{
+  public:
+    AsyncWebServerRequest(ArRequestHandlerFunction onRequest);
+    const std::shared_ptr<http_response> render(const http_request&) override;
+    void send(int status) {};//TODO
+    void send(AsyncWebServerResponse response){};//TODO
+  private:
+    ArRequestHandlerFunction m_fun;
+};
+
 class AsyncWebServer {
 public:
     AsyncWebServer();
@@ -37,7 +55,10 @@ public:
     void begin();
     void on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
 private:
+    const char* getMethodName(WebRequestMethodComposite method);
+    
     webserver ws;
+    std::vector<AsyncWebServerRequest*> m_requestVec;
 };
 
 
