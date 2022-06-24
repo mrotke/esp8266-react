@@ -1,6 +1,8 @@
 #ifndef APStatus_h
 #define APStatus_h
 
+#ifndef LINUX
+
 #ifdef ESP32
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -28,4 +30,5 @@ class APStatus {
   void apStatus(AsyncWebServerRequest* request);
 };
 
+#endif
 #endif  // end APStatus_h

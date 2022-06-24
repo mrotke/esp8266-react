@@ -1,4 +1,5 @@
 #include <APStatus.h>
+#ifndef LINUX
 
 APStatus::APStatus(AsyncWebServer* server, SecurityManager* securityManager, APSettingsService* apSettingsService) :
     _apSettingsService(apSettingsService) {
@@ -20,3 +21,4 @@ void APStatus::apStatus(AsyncWebServerRequest* request) {
   response->setLength();
   request->send(response);
 }
+#endif

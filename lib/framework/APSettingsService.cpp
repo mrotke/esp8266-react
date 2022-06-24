@@ -1,4 +1,5 @@
 #include <APSettingsService.h>
+#ifndef LINUX
 
 APSettingsService::APSettingsService(AsyncWebServer* server, FS* fs, SecurityManager* securityManager) :
     _httpEndpoint(APSettings::read, APSettings::update, this, server, AP_SETTINGS_SERVICE_PATH, securityManager),
@@ -81,3 +82,4 @@ APNetworkStatus APSettingsService::getAPNetworkStatus() {
   }
   return apActive ? APNetworkStatus::ACTIVE : APNetworkStatus::INACTIVE;
 }
+#endif

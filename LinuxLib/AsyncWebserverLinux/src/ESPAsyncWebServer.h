@@ -25,7 +25,13 @@ typedef uint8_t WebRequestMethodComposite;
 class AsyncWebServerResponse {
   public:
   void setLength() {}; //TODO
-  JsonVariant getRoot() {return NULL;}; //TODO
+  JsonVariant getRoot() {return ArduinoJson::JsonVariant();}; //TODO
+};
+
+class AsyncJsonResponse: public AsyncWebServerResponse
+{
+  public:
+  AsyncJsonResponse(bool isArray=false, size_t maxJsonBufferSize = 1024) {}; //TODO
 };
 
 class AsyncWebServerRequest;
@@ -36,7 +42,7 @@ class AsyncWebServerRequest;
 typedef std::function<bool(AsyncWebServerRequest *request)> ArRequestFilterFunction;
 typedef std::function<void(AsyncWebServerRequest *request, JsonVariant &json)> ArJsonRequestHandlerFunction;
 typedef std::function<void(AsyncWebServerRequest *request)> ArRequestHandlerFunction;
-
+typedef std::function<void(void)> ArDisconnectHandler;
 
 class AsyncWebServerRequest : public http_resource{
   public:
@@ -44,8 +50,21 @@ class AsyncWebServerRequest : public http_resource{
     const std::shared_ptr<http_response> render(const http_request&) override;
     void send(int status) {};//TODO
     void send(AsyncWebServerResponse response){};//TODO
+    void send(AsyncJsonResponse response){};//TODO
+    void onDisconnect (ArDisconnectHandler fn) {};//TODO
   private:
     ArRequestHandlerFunction m_fun;
+};
+
+class AsyncWebHandler
+{
+};
+
+class AsyncCallbackJsonWebHandler: public AsyncWebHandler
+{
+  public:
+  AsyncCallbackJsonWebHandler(const char* uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
+  void setMethod(WebRequestMethodComposite method){}; //TODO
 };
 
 class AsyncWebServer {
@@ -54,6 +73,7 @@ public:
     AsyncWebServer(uint16_t port);
     void begin();
     void on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
+    AsyncWebHandler& addHandler(AsyncWebHandler* handler) {};//TODO
 private:
     const char* getMethodName(WebRequestMethodComposite method);
     

@@ -10,6 +10,8 @@
 #include <mbedtls/md.h>
 #elif defined(ESP8266)
 #include <bearssl/bearssl_hmac.h>
+#elif defined(LINUX)
+#include <mbedtls/md.h>
 #endif
 
 class ArduinoJsonJWT {

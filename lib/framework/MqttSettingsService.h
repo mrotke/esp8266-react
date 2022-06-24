@@ -1,6 +1,8 @@
 #ifndef MqttSettingsService_h
 #define MqttSettingsService_h
 
+#if FT_MQTT == 1
+
 #include <StatefulService.h>
 #include <HttpEndpoint.h>
 #include <FSPersistence.h>
@@ -145,4 +147,5 @@ class MqttSettingsService : public StatefulService<MqttSettings> {
   void configureMqtt();
 };
 
+#endif
 #endif  // end MqttSettingsService_h

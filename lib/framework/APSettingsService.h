@@ -1,6 +1,8 @@
 #ifndef APSettingsConfig_h
 #define APSettingsConfig_h
 
+#ifndef LINUX
+
 #include <SettingValue.h>
 #include <HttpEndpoint.h>
 #include <FSPersistence.h>
@@ -143,4 +145,5 @@ class APSettingsService : public StatefulService<APSettings> {
   void handleDNS();
 };
 
+#endif
 #endif  // end APSettingsConfig_h

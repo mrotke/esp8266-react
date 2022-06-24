@@ -1,6 +1,8 @@
 #ifndef OTASettingsService_h
 #define OTASettingsService_h
 
+#if FT_ENABLED(FT_OTA)
+
 #include <HttpEndpoint.h>
 #include <FSPersistence.h>
 
@@ -69,4 +71,5 @@ class OTASettingsService : public StatefulService<OTASettings> {
 #endif
 };
 
+#endif
 #endif  // end OTASettingsService_h

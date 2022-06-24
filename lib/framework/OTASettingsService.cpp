@@ -1,5 +1,5 @@
 #include <OTASettingsService.h>
-
+#if FT_ENABLED(FT_OTA)
 OTASettingsService::OTASettingsService(AsyncWebServer* server, FS* fs, SecurityManager* securityManager) :
     _httpEndpoint(OTASettings::read, OTASettings::update, this, server, OTA_SETTINGS_SERVICE_PATH, securityManager),
     _fsPersistence(OTASettings::read, OTASettings::update, this, fs, OTA_SETTINGS_FILE),
@@ -68,4 +68,6 @@ void OTASettingsService::onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t i
 void OTASettingsService::onStationModeGotIP(const WiFiEventStationModeGotIP& event) {
   configureArduinoOTA();
 }
+#endif
+
 #endif
