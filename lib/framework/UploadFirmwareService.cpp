@@ -1,4 +1,5 @@
 #include <UploadFirmwareService.h>
+#ifndef LINUX
 
 UploadFirmwareService::UploadFirmwareService(AsyncWebServer* server, SecurityManager* securityManager) :
     _securityManager(securityManager) {
@@ -83,3 +84,4 @@ void UploadFirmwareService::handleEarlyDisconnect() {
   Update.end();
 #endif
 }
+#endif

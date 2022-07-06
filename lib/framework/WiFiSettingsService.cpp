@@ -1,4 +1,5 @@
 #include <WiFiSettingsService.h>
+#ifndef LINUX
 
 WiFiSettingsService::WiFiSettingsService(AsyncWebServer* server, FS* fs, SecurityManager* securityManager) :
     _httpEndpoint(WiFiSettings::read, WiFiSettings::update, this, server, WIFI_SETTINGS_SERVICE_PATH, securityManager),
@@ -97,4 +98,6 @@ void WiFiSettingsService::onStationModeStop(WiFiEvent_t event, WiFiEventInfo_t i
 void WiFiSettingsService::onStationModeDisconnected(const WiFiEventStationModeDisconnected& event) {
   WiFi.disconnect(true);
 }
+#endif
+
 #endif

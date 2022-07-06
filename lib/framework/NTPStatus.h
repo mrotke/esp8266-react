@@ -1,6 +1,8 @@
 #ifndef NTPStatus_h
 #define NTPStatus_h
 
+#include "Features.h"
+#if FT_ENABLED(FT_NTP)
 #include <time.h>
 #ifdef ESP32
 #include <WiFi.h>
@@ -28,4 +30,5 @@ class NTPStatus {
   void ntpStatus(AsyncWebServerRequest* request);
 };
 
+#endif
 #endif  // end NTPStatus_h

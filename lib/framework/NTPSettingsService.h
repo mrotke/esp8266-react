@@ -1,6 +1,8 @@
 #ifndef NTPSettingsService_h
 #define NTPSettingsService_h
 
+#include "Features.h"
+#if FT_ENABLED(FT_NTP)
 #include <HttpEndpoint.h>
 #include <FSPersistence.h>
 
@@ -81,4 +83,5 @@ class NTPSettingsService : public StatefulService<NTPSettings> {
   void configureTime(AsyncWebServerRequest* request, JsonVariant& json);
 };
 
+#endif
 #endif  // end NTPSettingsService_h

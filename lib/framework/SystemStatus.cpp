@@ -20,6 +20,7 @@ void SystemStatus::systemStatus(AsyncWebServerRequest* request) {
   root["max_alloc_heap"] = ESP.getMaxFreeBlockSize();
   root["heap_fragmentation"] = ESP.getHeapFragmentation();
 #endif
+#if defined(ESP32) || defined(ESP8266)
   root["cpu_freq_mhz"] = ESP.getCpuFreqMHz();
   root["free_heap"] = ESP.getFreeHeap();
   root["sketch_size"] = ESP.getSketchSize();
@@ -27,7 +28,7 @@ void SystemStatus::systemStatus(AsyncWebServerRequest* request) {
   root["sdk_version"] = ESP.getSdkVersion();
   root["flash_chip_size"] = ESP.getFlashChipSize();
   root["flash_chip_speed"] = ESP.getFlashChipSpeed();
-
+#endif
 // TODO - Ideally this class will take an *FS and extract the file system information from there.
 // ESP8266 and ESP32 do not have feature parity in FS.h which currently makes that difficult.
 #ifdef ESP32

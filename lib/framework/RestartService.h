@@ -19,9 +19,13 @@ class RestartService {
   RestartService(AsyncWebServer* server, SecurityManager* securityManager);
 
   static void restartNow() {
+    #ifndef LINUX
     WiFi.disconnect(true);
     delay(500);
     ESP.restart();
+    #else
+    
+    #endif
   }
 
  private:

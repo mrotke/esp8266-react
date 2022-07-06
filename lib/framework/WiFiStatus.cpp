@@ -1,4 +1,5 @@
 #include <WiFiStatus.h>
+#ifndef LINUX
 
 WiFiStatus::WiFiStatus(AsyncWebServer* server, SecurityManager* securityManager) {
   server->on(WIFI_STATUS_SERVICE_PATH,
@@ -73,3 +74,4 @@ void WiFiStatus::wifiStatus(AsyncWebServerRequest* request) {
   response->setLength();
   request->send(response);
 }
+#endif

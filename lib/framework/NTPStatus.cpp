@@ -1,4 +1,5 @@
 #include <NTPStatus.h>
+#if FT_ENABLED(FT_NTP)
 
 NTPStatus::NTPStatus(AsyncWebServer* server, SecurityManager* securityManager) {
   server->on(NTP_STATUS_SERVICE_PATH,
@@ -51,3 +52,4 @@ void NTPStatus::ntpStatus(AsyncWebServerRequest* request) {
   response->setLength();
   request->send(response);
 }
+#endif

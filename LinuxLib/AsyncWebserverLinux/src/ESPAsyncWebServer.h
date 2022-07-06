@@ -64,6 +64,7 @@ class AsyncCallbackJsonWebHandler: public AsyncWebHandler
 {
   public:
   AsyncCallbackJsonWebHandler(const char* uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
+  AsyncCallbackJsonWebHandler(const String& uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
   void setMethod(WebRequestMethodComposite method){}; //TODO
 };
 

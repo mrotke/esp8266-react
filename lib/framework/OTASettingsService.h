@@ -1,6 +1,7 @@
 #ifndef OTASettingsService_h
 #define OTASettingsService_h
 
+#include "Features.h"
 #if FT_ENABLED(FT_OTA)
 
 #include <HttpEndpoint.h>

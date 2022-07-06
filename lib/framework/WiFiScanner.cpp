@@ -1,4 +1,5 @@
 #include <WiFiScanner.h>
+#ifndef LINUX
 
 WiFiScanner::WiFiScanner(AsyncWebServer* server, SecurityManager* securityManager) {
   server->on(SCAN_NETWORKS_SERVICE_PATH,
@@ -67,4 +68,5 @@ uint8_t WiFiScanner::convertEncryptionType(uint8_t encryptionType) {
   }
   return -1;
 }
+#endif
 #endif

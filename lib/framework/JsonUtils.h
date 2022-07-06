@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <IPUtils.h>
 #include <ArduinoJson.h>
+#include "IPAddress.h"
 
 class JsonUtils {
  public:
@@ -21,7 +22,17 @@ class JsonUtils {
   }
   static void writeIP(JsonObject& root, const String& key, const IPAddress& ip) {
     if (IPUtils::isSet(ip)) {
-      root[key] = ip.toString();
+    String sstr;
+    sstr.reserve(16); // 4 bytes with 3 chars max + 3 dots + nullterm, or '(IP unset)'
+    //sstr += String()
+
+    for (int i =0; i < 3; i++)
+    {
+        sstr += String(ip[i]);
+        sstr += String('.');
+    }
+    sstr += String(ip[3]);
+    root[key] = sstr;
     }
   }
 };

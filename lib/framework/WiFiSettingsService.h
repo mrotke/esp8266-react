@@ -1,6 +1,8 @@
 #ifndef WiFiSettingsService_h
 #define WiFiSettingsService_h
 
+#ifndef LINUX
+
 #include <SettingValue.h>
 #include <StatefulService.h>
 #include <FSPersistence.h>
@@ -109,4 +111,5 @@ class WiFiSettingsService : public StatefulService<WiFiSettings> {
   void manageSTA();
 };
 
+#endif
 #endif  // end WiFiSettingsService_h

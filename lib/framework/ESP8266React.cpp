@@ -3,11 +3,13 @@
 ESP8266React::ESP8266React(AsyncWebServer* server) :
     _featureService(server),
     _securitySettingsService(server, &ESPFS),
+#ifndef LINUX
     _wifiSettingsService(server, &ESPFS, &_securitySettingsService),
     _wifiScanner(server, &_securitySettingsService),
     _wifiStatus(server, &_securitySettingsService),
     _apSettingsService(server, &ESPFS, &_securitySettingsService),
     _apStatus(server, &_securitySettingsService, &_apSettingsService),
+#endif
 #if FT_ENABLED(FT_NTP)
     _ntpSettingsService(server, &ESPFS, &_securitySettingsService),
     _ntpStatus(server, &_securitySettingsService),
@@ -53,6 +55,7 @@ ESP8266React::ESP8266React(AsyncWebServer* server) :
         }
       });
 #else
+#ifndef LINUX
   // Serve static resources from /www/
   server->serveStatic("/js/", ESPFS, "/www/js/");
   server->serveStatic("/css/", ESPFS, "/www/css/");
@@ -71,6 +74,7 @@ ESP8266React::ESP8266React(AsyncWebServer* server) :
     }
   });
 #endif
+#endif
 
 // Enable CORS if required
 #if defined(ENABLE_CORS)
@@ -86,8 +90,10 @@ void ESP8266React::begin() {
 #elif defined(ESP8266)
   ESPFS.begin();
 #endif
+#ifndef LINUX
   _wifiSettingsService.begin();
   _apSettingsService.begin();
+#endif
 #if FT_ENABLED(FT_NTP)
   _ntpSettingsService.begin();
 #endif
@@ -103,8 +109,10 @@ void ESP8266React::begin() {
 }
 
 void ESP8266React::loop() {
+#ifndef LINUX
   _wifiSettingsService.loop();
   _apSettingsService.loop();
+#endif
 #if FT_ENABLED(FT_OTA)
   _otaSettingsService.loop();
 #endif

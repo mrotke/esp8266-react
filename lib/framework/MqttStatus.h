@@ -1,6 +1,9 @@
 #ifndef MqttStatus_h
 #define MqttStatus_h
 
+#include "Features.h"
+#if FT_ENABLED(FT_MQTT)
+
 #ifdef ESP32
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -28,4 +31,5 @@ class MqttStatus {
   void mqttStatus(AsyncWebServerRequest* request);
 };
 
+#endif
 #endif  // end MqttStatus_h

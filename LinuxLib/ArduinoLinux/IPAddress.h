@@ -46,7 +46,7 @@ public:
 
     bool fromString(const char *address);
     bool fromString(const String &address) { return fromString(address.c_str()); }
-
+    String toString() const;
     // Overloaded cast operator to allow IPAddress objects to be used where a pointer
     // to a four-byte uint8_t array is expected
     operator uint32_t() const { return _address.dword; };

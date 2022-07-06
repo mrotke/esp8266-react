@@ -1,4 +1,5 @@
 #include <NTPSettingsService.h>
+#if FT_ENABLED(FT_NTP)
 
 NTPSettingsService::NTPSettingsService(AsyncWebServer* server, FS* fs, SecurityManager* securityManager) :
     _httpEndpoint(NTPSettings::read, NTPSettings::update, this, server, NTP_SETTINGS_SERVICE_PATH, securityManager),
@@ -88,3 +89,4 @@ void NTPSettingsService::configureTime(AsyncWebServerRequest* request, JsonVaria
   AsyncWebServerResponse* response = request->beginResponse(400);
   request->send(response);
 }
+#endif

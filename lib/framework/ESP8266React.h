@@ -58,7 +58,7 @@ class ESP8266React {
     return &_securitySettingsService;
   }
 #endif
-
+#ifndef LINUX
   StatefulService<WiFiSettings>* getWiFiSettingsService() {
     return &_wifiSettingsService;
   }
@@ -66,7 +66,7 @@ class ESP8266React {
   StatefulService<APSettings>* getAPSettingsService() {
     return &_apSettingsService;
   }
-
+#endif
 #if FT_ENABLED(FT_NTP)
   StatefulService<NTPSettings>* getNTPSettingsService() {
     return &_ntpSettingsService;
@@ -96,11 +96,13 @@ class ESP8266React {
  private:
   FeaturesService _featureService;
   SecuritySettingsService _securitySettingsService;
+  #ifndef LINUX
   WiFiSettingsService _wifiSettingsService;
   WiFiScanner _wifiScanner;
   WiFiStatus _wifiStatus;
   APSettingsService _apSettingsService;
   APStatus _apStatus;
+  #endif
 #if FT_ENABLED(FT_NTP)
   NTPSettingsService _ntpSettingsService;
   NTPStatus _ntpStatus;

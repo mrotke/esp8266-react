@@ -1,5 +1,6 @@
 #ifndef WiFiScanner_h
 #define WiFiScanner_h
+#ifndef LINUX
 
 #ifdef ESP32
 #include <WiFi.h>
@@ -33,3 +34,4 @@ class WiFiScanner {
 };
 
 #endif  // end WiFiScanner_h
+#endif

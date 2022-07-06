@@ -22,6 +22,9 @@
 #elif defined(ESP8266)
 #define LED_ON 0x0
 #define LED_OFF 0x1
+#elif defined(LINUX)
+#define LED_ON 0x0
+#define LED_OFF 0x1
 #endif
 
 #define LIGHT_SETTINGS_ENDPOINT_PATH "/rest/lightState"

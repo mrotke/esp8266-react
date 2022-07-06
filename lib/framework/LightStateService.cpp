@@ -1,9 +1,9 @@
 #include <LightStateService.h>
 
 LightStateService::LightStateService(AsyncWebServer* server,
-                                     SecurityManager* securityManager,
+                                     SecurityManager* securityManager
                                      #ifndef LINUX
-                                     AsyncMqttClient* mqttClient,
+                                     ,AsyncMqttClient* mqttClient,
                                      LightMqttSettingsService* lightMqttSettingsService
                                      #endif
                                      ) :
@@ -13,9 +13,9 @@ LightStateService::LightStateService(AsyncWebServer* server,
                   server,
                   LIGHT_SETTINGS_ENDPOINT_PATH,
                   securityManager,
-                  AuthenticationPredicates::IS_AUTHENTICATED),
+                  AuthenticationPredicates::IS_AUTHENTICATED)
     #ifndef LINUX
-    _mqttPubSub(LightState::haRead, LightState::haUpdate, this, mqttClient),
+    ,_mqttPubSub(LightState::haRead, LightState::haUpdate, this, mqttClient),
     _webSocket(LightState::read,
                LightState::update,
                this,

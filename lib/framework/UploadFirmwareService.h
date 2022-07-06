@@ -1,8 +1,9 @@
 #ifndef UploadFirmwareService_h
 #define UploadFirmwareService_h
 
-#include <Arduino.h>
+#ifndef LINUX
 
+#include <Arduino.h>
 #ifdef ESP32
 #include <Update.h>
 #include <WiFi.h>
@@ -36,3 +37,4 @@ class UploadFirmwareService {
 };
 
 #endif  // end UploadFirmwareService_h
+#endif

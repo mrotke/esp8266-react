@@ -82,6 +82,21 @@ bool IPAddress::fromString(const char *address)
     return true;
 }
 
+String IPAddress::toString() const
+{
+    String sstr;
+    sstr.reserve(16); // 4 bytes with 3 chars max + 3 dots + nullterm, or '(IP unset)'
+    //sstr += String()
+
+    for (int i =0; i < 3; i++)
+    {
+        sstr += String(_address.bytes[i]);
+        sstr += String('.');
+    }
+    sstr += String(_address.bytes[3]);
+    return sstr;
+}
+
 IPAddress& IPAddress::operator=(const uint8_t *address)
 {
     memcpy(_address.bytes, address, sizeof(_address.bytes));

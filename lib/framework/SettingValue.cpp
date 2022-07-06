@@ -6,6 +6,8 @@ namespace SettingValue {
 const String PLATFORM = "esp32";
 #elif defined(ESP8266)
 const String PLATFORM = "esp8266";
+#elif defined(LINUX)
+const String PLATFORM = "LINUX";
 #endif
 
 /**
