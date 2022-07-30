@@ -27,8 +27,10 @@ LightStateService::LightStateService(AsyncWebServer* server,
     _lightMqttSettingsService(lightMqttSettingsService) 
     #endif
   {
+  #ifndef LINUX
   // configure led to be output
   pinMode(LED_PIN, OUTPUT);
+  #endif
 
 #ifndef LINUX
   // configure MQTT callback
@@ -47,7 +49,9 @@ void LightStateService::begin() {
 }
 
 void LightStateService::onConfigUpdated() {
+  #ifndef LINUX
   digitalWrite(LED_PIN, _state.ledOn ? LED_ON : LED_OFF);
+  #endif
 }
 
 void LightStateService::registerConfig() {

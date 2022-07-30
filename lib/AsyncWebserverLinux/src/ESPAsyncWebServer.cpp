@@ -1,18 +1,29 @@
 #include "ESPAsyncWebServer.h"
+#include <iostream>
+#include <stdexcept>
 
 AsyncWebServer::AsyncWebServer()
 {
-    ws = create_webserver(80);
+    ws = unique_ptr<webserver>(new webserver(create_webserver(80)));
 }
 
-AsyncWebServer::AsyncWebServer(uint16_t port)
+AsyncWebServer::AsyncWebServer(unsigned short port)
 {
-    ws = create_webserver(port);
+    ws = unique_ptr<webserver>(new webserver(create_webserver(port)));
 }
 
 void AsyncWebServer::begin()
 {
-    ws.start(false);
+    for (auto i : m_handlerMap)
+        ws->register_resource(i.first, i.second);
+    try 
+    {
+        ws->start(false);
+    } catch (std::invalid_argument const& ex )
+    {
+        std::cout << "#1: " << ex.what() << '\n';
+    }
+    
 }
 
 void AsyncWebServer::on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest)
@@ -20,7 +31,8 @@ void AsyncWebServer::on(const char* uri, WebRequestMethodComposite method, ArReq
     AsyncWebServerRequest* req = new AsyncWebServerRequest(onRequest);
     req->disallow_all();
     req->set_allowing(getMethodName(method), true);
-    ws.register_resource(uri, req);
+    //ws.register_resource(uri, req);
+    m_handlerMap[string(uri)] = req;
     m_requestVec.push_back(req);
 }
 

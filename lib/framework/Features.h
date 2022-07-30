@@ -11,7 +11,7 @@
 // security feature on by default
 #ifndef FT_SECURITY
 #ifdef LINUX
-#define FT_SECURITY 0
+#define FT_SECURITY 1
 #else
 #define FT_SECURITY 1
 #endif

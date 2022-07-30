@@ -32,6 +32,8 @@
 
 class LightState {
  public:
+  LightState(){};
+  LightState(StatefulService<LightState> state){};
   bool ledOn;
 
   static void read(LightState& settings, JsonObject& root) {

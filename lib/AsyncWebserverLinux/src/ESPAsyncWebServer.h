@@ -4,10 +4,13 @@
 #include <functional>
 #include <ArduinoJson.h>
 #include <httpserver.hpp>
+#include <unordered_map>
+#include <string>
 #include <vector>
 #include <memory>
 
 using namespace httpserver;
+using namespace std;
 
 typedef enum {
   HTTP_GET     = 0b00000001,
@@ -44,14 +47,36 @@ typedef std::function<void(AsyncWebServerRequest *request, JsonVariant &json)> A
 typedef std::function<void(AsyncWebServerRequest *request)> ArRequestHandlerFunction;
 typedef std::function<void(void)> ArDisconnectHandler;
 
+class AsyncWebParameter
+{
+  public:
+    AsyncWebParameter(){};
+    const String& value() {return m_value;};//TODO
+  private:
+    String m_value;
+};
+
+class AsyncWebHeader
+{
+  public:
+    AsyncWebHeader(){};
+    const String& value() {return m_value;};//TODO
+  private:
+    String m_value;
+};
+
 class AsyncWebServerRequest : public http_resource{
   public:
-    AsyncWebServerRequest(ArRequestHandlerFunction onRequest);
+    AsyncWebServerRequest(ArRequestHandlerFunction onRequest) {}; //TODO
     const std::shared_ptr<http_response> render(const http_request&) override;
     void send(int status) {};//TODO
     void send(AsyncWebServerResponse response){};//TODO
     void send(AsyncJsonResponse response){};//TODO
     void onDisconnect (ArDisconnectHandler fn) {};//TODO
+    AsyncWebServerResponse *beginResponse(int code){ return nullptr;}; //TODO
+    AsyncWebHeader* getHeader(const String& name) const {return nullptr;}; //TODO
+    bool hasParam(const String& name) const {return false;}; //TODO
+    AsyncWebParameter* getParam(const String& name) const {return nullptr;}; //TODO
   private:
     ArRequestHandlerFunction m_fun;
 };
@@ -66,20 +91,22 @@ class AsyncCallbackJsonWebHandler: public AsyncWebHandler
   AsyncCallbackJsonWebHandler(const char* uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
   AsyncCallbackJsonWebHandler(const String& uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
   void setMethod(WebRequestMethodComposite method){}; //TODO
+  void setMaxContentLength(int maxContentLength){};
 };
 
 class AsyncWebServer {
 public:
     AsyncWebServer();
-    AsyncWebServer(uint16_t port);
+    AsyncWebServer(unsigned short port);
     void begin();
     void on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
-    AsyncWebHandler& addHandler(AsyncWebHandler* handler) {};//TODO
+    AsyncWebHandler& addHandler(AsyncWebHandler* handler) { return *handler;};//TODO
 private:
     const char* getMethodName(WebRequestMethodComposite method);
     
-    webserver ws;
-    std::vector<AsyncWebServerRequest*> m_requestVec;
+    unique_ptr<webserver> ws = nullptr;
+    vector<AsyncWebServerRequest*> m_requestVec;
+    unordered_map<string, AsyncWebServerRequest*> m_handlerMap;
 };
 
 

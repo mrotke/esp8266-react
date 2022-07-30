@@ -72,7 +72,7 @@ class HttpPostEndpoint {
               std::bind(&HttpPostEndpoint::updateSettings, this, std::placeholders::_1, std::placeholders::_2),
               authenticationPredicate),
           bufferSize),
-      _bufferSize(bufferSize) {
+      _bufferSize(bufferSize){ 
     _updateHandler.setMethod(HTTP_POST);
     server->addHandler(&_updateHandler);
   }

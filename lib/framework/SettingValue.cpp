@@ -29,7 +29,11 @@ String replaceEach(String value, String pattern, String (*generateReplacement)()
  * Generates a random number, encoded as a hex string.
  */
 String getRandom() {
+  #ifdef LINUX
+  return String(rand()%2147483647,HEX);
+  #else
   return String(random(2147483647), HEX);
+  #endif
 }
 
 /**
