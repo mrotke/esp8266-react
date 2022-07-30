@@ -9,7 +9,7 @@ AsyncWebServer server(80);
 #endif
 
 #ifdef LINUX
-AsyncWebServer server(80);
+AsyncWebServer server(8080);
 #endif
 
 ESP8266React esp8266React(&server);
