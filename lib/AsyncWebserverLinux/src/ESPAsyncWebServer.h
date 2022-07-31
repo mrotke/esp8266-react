@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 #include <httpserver.hpp>
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <vector>
 #include <memory>
@@ -27,14 +28,27 @@ typedef uint8_t WebRequestMethodComposite;
 
 class AsyncWebServerResponse {
   public:
-  void setLength() {}; //TODO
-  JsonVariant getRoot() {return ArduinoJson::JsonVariant();}; //TODO
+  AsyncWebServerResponse() {};
+  AsyncWebServerResponse( int code) { m_code = code;};
+  void setLength() {};
+  int GetCode() const {return m_code;};
+  const string& GetContentType() const { return m_contentType;};
+  virtual const string GetContent() const {return string("");};
+  protected:
+  string m_contentType = "text/plain";
+  int m_code = 200;
+
 };
 
 class AsyncJsonResponse: public AsyncWebServerResponse
 {
   public:
-  AsyncJsonResponse(bool isArray=false, size_t maxJsonBufferSize = 1024) {}; //TODO
+  AsyncJsonResponse(bool isArray=false, size_t maxJsonBufferSize = 1024);
+  JsonVariant getRoot() {return m_root;};
+  const string GetContent() const override;
+  private:
+  DynamicJsonDocument m_JSONBuffer;
+  JsonVariant m_root;
 };
 
 class AsyncWebServerRequest;
@@ -51,7 +65,8 @@ class AsyncWebParameter
 {
   public:
     AsyncWebParameter(){};
-    const String& value() {return m_value;};//TODO
+    const String& value() {return m_value;};
+    void SetValue(string str) {m_value = str.c_str();};
   private:
     String m_value;
 };
@@ -60,38 +75,67 @@ class AsyncWebHeader
 {
   public:
     AsyncWebHeader(){};
-    const String& value() {return m_value;};//TODO
+    const String& value() {return m_value;};
+    void SetValue(string str) {m_value = str.c_str();};
   private:
     String m_value;
 };
 
 class AsyncWebServerRequest : public http_resource{
   public:
-    AsyncWebServerRequest(ArRequestHandlerFunction onRequest) {}; //TODO
+    AsyncWebServerRequest(ArRequestHandlerFunction onRequest);
     const std::shared_ptr<http_response> render(const http_request&) override;
-    void send(int status) {};//TODO
-    void send(AsyncWebServerResponse response){};//TODO
-    void send(AsyncJsonResponse response){};//TODO
+    void send(int status);
+    void send(AsyncJsonResponse response);
+    void send(AsyncWebServerResponse response);
     void onDisconnect (ArDisconnectHandler fn) {};//TODO
-    AsyncWebServerResponse *beginResponse(int code){ return nullptr;}; //TODO
-    AsyncWebHeader* getHeader(const String& name) const {return nullptr;}; //TODO
-    bool hasParam(const String& name) const {return false;}; //TODO
-    AsyncWebParameter* getParam(const String& name) const {return nullptr;}; //TODO
+    AsyncWebServerResponse *beginResponse(int code);
+    AsyncWebHeader* getHeader(const String& name);
+    bool hasParam(const String& name);
+    AsyncWebParameter* getParam(const String& name);
+  protected:
+    shared_ptr<http_response> m_response = nullptr;
   private:
-    ArRequestHandlerFunction m_fun;
+    ArRequestHandlerFunction m_fun = nullptr;
+    unique_ptr<AsyncWebServerResponse> m_tmpResponse= nullptr;
+    unique_ptr<AsyncWebHeader> m_tmpHeader= nullptr;
+    unique_ptr<AsyncWebParameter> m_tmpParam= nullptr;
+    map<string, string, http::header_comparator> m_headers;
+    map<string, string, http::arg_comparator> m_params;
+};
+
+
+class AsyncWebServerJSONRequest : public AsyncWebServerRequest{
+  public:
+    AsyncWebServerJSONRequest(ArJsonRequestHandlerFunction onRequest);
+    const std::shared_ptr<http_response> render(const http_request&) override;
+  private:
+    ArJsonRequestHandlerFunction m_JSONfun = nullptr;
 };
 
 class AsyncWebHandler
 {
+  public:
+  void setMethod(WebRequestMethodComposite method) {m_allowedMethods = method;};
+  void setMaxContentLength(int maxContentLength){};
+  WebRequestMethodComposite GetMethod() const {return m_allowedMethods;};
+  virtual AsyncWebServerRequest* CreateRequest() = 0;
+  const string& GetURI() const { return m_uri;};
+  protected:
+    string m_uri;
+  private:
+    WebRequestMethodComposite m_allowedMethods;
 };
 
 class AsyncCallbackJsonWebHandler: public AsyncWebHandler
 {
   public:
-  AsyncCallbackJsonWebHandler(const char* uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
-  AsyncCallbackJsonWebHandler(const String& uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024) {};//TODO
-  void setMethod(WebRequestMethodComposite method){}; //TODO
-  void setMaxContentLength(int maxContentLength){};
+  AsyncCallbackJsonWebHandler(const char* uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024);
+  AsyncCallbackJsonWebHandler(const String& uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024);
+  ArJsonRequestHandlerFunction GetFun() {return m_JSONfun;};
+  AsyncWebServerRequest* CreateRequest() override;
+  private:
+    ArJsonRequestHandlerFunction m_JSONfun = nullptr;
 };
 
 class AsyncWebServer {
@@ -100,7 +144,7 @@ public:
     AsyncWebServer(unsigned short port);
     void begin();
     void on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
-    AsyncWebHandler& addHandler(AsyncWebHandler* handler) { return *handler;};//TODO
+    AsyncWebHandler& addHandler(AsyncWebHandler* handler);
 private:
     const char* getMethodName(WebRequestMethodComposite method);
     
