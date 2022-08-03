@@ -83,8 +83,9 @@ class AsyncWebHeader
 
 class AsyncWebServerRequest : public http_resource{
   public:
-    AsyncWebServerRequest(ArRequestHandlerFunction onRequest);
-    const std::shared_ptr<http_response> render(const http_request&) override;
+    AsyncWebServerRequest();
+    const std::shared_ptr<http_response> render_GET(const http_request&) override;
+    const std::shared_ptr<http_response> render_POST(const http_request&) override;
     void send(int status);
     void send(AsyncJsonResponse response);
     void send(AsyncWebServerResponse response);
@@ -93,24 +94,31 @@ class AsyncWebServerRequest : public http_resource{
     AsyncWebHeader* getHeader(const String& name);
     bool hasParam(const String& name);
     AsyncWebParameter* getParam(const String& name);
+    void SetPOSTCallback(ArRequestHandlerFunction fun) {m_funPOST = fun;};
+    void SetGETCallback(ArRequestHandlerFunction fun) {m_funGET = fun;};
   protected:
     shared_ptr<http_response> m_response = nullptr;
+    ArRequestHandlerFunction m_funGET = nullptr;
+    ArRequestHandlerFunction m_funPOST = nullptr;
+    map<string, string, http::header_comparator> m_headers;
+    map<string, string, http::arg_comparator> m_params;
   private:
-    ArRequestHandlerFunction m_fun = nullptr;
     unique_ptr<AsyncWebServerResponse> m_tmpResponse= nullptr;
     unique_ptr<AsyncWebHeader> m_tmpHeader= nullptr;
     unique_ptr<AsyncWebParameter> m_tmpParam= nullptr;
-    map<string, string, http::header_comparator> m_headers;
-    map<string, string, http::arg_comparator> m_params;
 };
 
 
 class AsyncWebServerJSONRequest : public AsyncWebServerRequest{
   public:
-    AsyncWebServerJSONRequest(ArJsonRequestHandlerFunction onRequest);
-    const std::shared_ptr<http_response> render(const http_request&) override;
+    AsyncWebServerJSONRequest();
+    const std::shared_ptr<http_response> render_GET(const http_request&) override;
+    const std::shared_ptr<http_response> render_POST(const http_request&) override;
+    void SetPOSTJSONCallback(ArJsonRequestHandlerFunction fun) {m_JSONfunPOST = fun;};
+    void SetGETJSONCallback(ArJsonRequestHandlerFunction fun) {m_JSONfunGET = fun;};
   private:
-    ArJsonRequestHandlerFunction m_JSONfun = nullptr;
+    ArJsonRequestHandlerFunction m_JSONfunGET = nullptr;
+    ArJsonRequestHandlerFunction m_JSONfunPOST = nullptr;
 };
 
 class AsyncWebHandler
@@ -119,11 +127,11 @@ class AsyncWebHandler
   void setMethod(WebRequestMethodComposite method) {m_allowedMethods = method;};
   void setMaxContentLength(int maxContentLength){};
   WebRequestMethodComposite GetMethod() const {return m_allowedMethods;};
-  virtual AsyncWebServerRequest* CreateRequest() = 0;
+  virtual AsyncWebServerJSONRequest* CreateRequest() = 0;
+  virtual ArJsonRequestHandlerFunction GetFun() = 0;
   const string& GetURI() const { return m_uri;};
   protected:
     string m_uri;
-  private:
     WebRequestMethodComposite m_allowedMethods;
 };
 
@@ -132,8 +140,8 @@ class AsyncCallbackJsonWebHandler: public AsyncWebHandler
   public:
   AsyncCallbackJsonWebHandler(const char* uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024);
   AsyncCallbackJsonWebHandler(const String& uri, ArJsonRequestHandlerFunction onRequest, size_t maxJsonBufferSize=1024);
-  ArJsonRequestHandlerFunction GetFun() {return m_JSONfun;};
-  AsyncWebServerRequest* CreateRequest() override;
+  ArJsonRequestHandlerFunction GetFun() override {return m_JSONfun;};
+  AsyncWebServerJSONRequest* CreateRequest() override;
   private:
     ArJsonRequestHandlerFunction m_JSONfun = nullptr;
 };
@@ -149,8 +157,8 @@ private:
     const char* getMethodName(WebRequestMethodComposite method);
     
     unique_ptr<webserver> ws = nullptr;
-    vector<AsyncWebServerRequest*> m_requestVec;
-    unordered_map<string, AsyncWebServerRequest*> m_handlerMap;
+    vector<AsyncWebServerJSONRequest*> m_requestVec;
+    unordered_map<string, AsyncWebServerJSONRequest*> m_handlerMap;
 };
 
 

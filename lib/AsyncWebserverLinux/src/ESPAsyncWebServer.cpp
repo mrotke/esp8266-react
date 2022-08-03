@@ -28,33 +28,80 @@ void AsyncWebServer::begin()
 
 void AsyncWebServer::on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest)
 {
-    AsyncWebServerRequest* req = new AsyncWebServerRequest(onRequest);
-    req->disallow_all();
+    bool requestExist = false;
+    AsyncWebServerJSONRequest* req = nullptr;
+    if (m_handlerMap.count(string(uri)))
+    {
+        req = m_handlerMap[string(uri)];
+        requestExist = true;
+    }
+    else
+    {
+        req = new AsyncWebServerJSONRequest();
+    }
+    
+    if (!requestExist)
+        req->disallow_all();
+    
     for (uint8_t i = 0; i < 8 ; i++)
     {
         uint8_t one_method = method & (1 << i);
         if (one_method)
             req->set_allowing(getMethodName(one_method), true);
     }
+
+    if(method == HTTP_GET)
+        req->SetGETCallback(onRequest);
+
+    if(method == HTTP_POST)
+        req->SetPOSTCallback(onRequest);
     
-    //ws.register_resource(uri, req);
-    m_handlerMap[string(uri)] = req;
-    m_requestVec.push_back(req);
+    if (!requestExist)
+    {
+        m_handlerMap[string(uri)] = req;
+        m_requestVec.push_back(req);
+    }
+
 }
 
 
 AsyncWebHandler& AsyncWebServer::addHandler(AsyncWebHandler* handler)
 {
-    AsyncWebServerRequest* req = handler->CreateRequest();
-    req->disallow_all();
+    bool requestExist = false;
+
+    AsyncWebServerJSONRequest* req = nullptr;
+    if (m_handlerMap.count(handler->GetURI()))
+    {
+        req = m_handlerMap[handler->GetURI()];
+        requestExist = true;
+    }
+    else
+    {
+        req = handler->CreateRequest();
+    }
+
+    if (!requestExist)
+        req->disallow_all();
+
     for (uint8_t i = 0; i < 8 ; i++)
     {
         uint8_t one_method = handler->GetMethod() & (1 << i);
         if (one_method)
             req->set_allowing(getMethodName(one_method), true);
     }
-    m_handlerMap[handler->GetURI()] = req;
-    m_requestVec.push_back(req);
+
+    if(handler->GetMethod() == HTTP_GET)
+        req->SetGETJSONCallback(handler->GetFun());
+
+    if(handler->GetMethod() == HTTP_POST)
+        req->SetPOSTJSONCallback(handler->GetFun());
+
+    if (!requestExist)
+    {
+        m_handlerMap[handler->GetURI()] = req;
+        m_requestVec.push_back(req);
+    }
+
 
     return *handler;
 }
@@ -85,33 +132,73 @@ const char* AsyncWebServer::getMethodName(WebRequestMethodComposite method)
     }
 }
 
-const std::shared_ptr<http_response> AsyncWebServerRequest::render(const http_request& req)
+const std::shared_ptr<http_response> AsyncWebServerRequest::render_GET(const http_request& req)
 {
-    m_fun(this);
     m_headers = req.get_headers();
     m_params = req.get_args();
-    return std::shared_ptr<http_response>(new string_response("Hello, World!"));//TODO
+    m_funGET(this);
+    return m_response;
+}
+
+const std::shared_ptr<http_response> AsyncWebServerRequest::render_POST(const http_request& req)
+{
+    m_headers = req.get_headers();
+    m_params = req.get_args();
+    m_funPOST(this);
+    return m_response;
 }
 
 
-AsyncWebServerJSONRequest::AsyncWebServerJSONRequest(ArJsonRequestHandlerFunction onRequest)
-:AsyncWebServerRequest(nullptr),
-m_JSONfun(onRequest)
+AsyncWebServerJSONRequest::AsyncWebServerJSONRequest()
+:AsyncWebServerRequest()
 {
 
 }
 
-const std::shared_ptr<http_response> AsyncWebServerJSONRequest::render(const http_request& req)
+const std::shared_ptr<http_response> AsyncWebServerJSONRequest::render_GET(const http_request& req)
 {
-    string content = req.get_content();
-    DynamicJsonDocument doc(content.length() + 1);
+    m_headers = req.get_headers();
+    m_params = req.get_args();
+    if (m_JSONfunGET)
+    {
+        string content = req.get_content();
+        DynamicJsonDocument doc(content.length() + 1);
 
-    deserializeJson(doc , content.c_str());
+        deserializeJson(doc , content.c_str());
 
-    JsonVariant variant = doc.as<JsonVariant>();
-    m_JSONfun(this, variant);
+        JsonVariant variant = doc.as<JsonVariant>();
+        m_JSONfunGET(this, variant);
+    }
+    else if (m_funGET)
+    {
+        m_funGET(this);
+    }
 
-    return std::shared_ptr<http_response>(new string_response("Hello, World!"));//TODO
+
+    return m_response;
+}
+
+const std::shared_ptr<http_response> AsyncWebServerJSONRequest::render_POST(const http_request& req)
+{
+    m_headers = req.get_headers();
+    m_params = req.get_args();
+    if (m_JSONfunPOST)
+    {
+        string content = req.get_content();
+        DynamicJsonDocument doc(content.length() + 1);
+
+        deserializeJson(doc , content.c_str());
+
+        JsonVariant variant = doc.as<JsonVariant>();
+        m_JSONfunPOST(this, variant);
+    }
+    else if (m_funPOST)
+    {
+        m_funPOST(this);
+    }
+
+
+    return m_response;
 }
 
 AsyncJsonResponse::AsyncJsonResponse(bool isArray, size_t maxJsonBufferSize):
@@ -135,8 +222,7 @@ const string AsyncJsonResponse::GetContent() const
 }
 
 
-AsyncWebServerRequest::AsyncWebServerRequest(ArRequestHandlerFunction onRequest):
-m_fun(onRequest)
+AsyncWebServerRequest::AsyncWebServerRequest()
 {
 
 }
@@ -209,8 +295,15 @@ AsyncCallbackJsonWebHandler::AsyncCallbackJsonWebHandler(const String& uri, ArJs
     m_JSONfun = onRequest;
 }
 
-AsyncWebServerRequest* AsyncCallbackJsonWebHandler::CreateRequest()
+AsyncWebServerJSONRequest* AsyncCallbackJsonWebHandler::CreateRequest()
 {
-    AsyncWebServerJSONRequest* request = new AsyncWebServerJSONRequest(m_JSONfun);
+    AsyncWebServerJSONRequest* request = new AsyncWebServerJSONRequest();
+
+    if (m_allowedMethods == HTTP_GET)
+        request->SetGETJSONCallback(m_JSONfun);
+
+    if (m_allowedMethods == HTTP_POST)
+        request->SetPOSTJSONCallback(m_JSONfun);
+
     return request;
 }
