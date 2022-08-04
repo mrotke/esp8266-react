@@ -233,14 +233,14 @@ void AsyncWebServerRequest::send(int status)
     m_response =shared_ptr<http_response>(new string_response("", status));
 }
 
-void AsyncWebServerRequest::send(AsyncJsonResponse response)
+void AsyncWebServerRequest::send(AsyncJsonResponse* response)
 {
-    m_response =shared_ptr<http_response>(new string_response(response.GetContent(), response.GetCode(), response.GetContentType()));
+    m_response =shared_ptr<http_response>(new string_response(response->GetContent(), response->GetCode(), response->GetContentType()));
 }
 
-void AsyncWebServerRequest::send(AsyncWebServerResponse response)
+void AsyncWebServerRequest::send(AsyncWebServerResponse* response)
 {
-    m_response =shared_ptr<http_response>(new string_response(response.GetContent(), response.GetCode(), response.GetContentType()));
+    m_response =shared_ptr<http_response>(new string_response(response->GetContent(), response->GetCode(), response->GetContentType()));
 }
 
 AsyncWebServerResponse* AsyncWebServerRequest::beginResponse(int code)

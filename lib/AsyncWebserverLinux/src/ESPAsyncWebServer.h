@@ -44,7 +44,7 @@ class AsyncJsonResponse: public AsyncWebServerResponse
 {
   public:
   AsyncJsonResponse(bool isArray=false, size_t maxJsonBufferSize = 1024);
-  JsonVariant getRoot() {return m_root;};
+  JsonVariant& getRoot() {return m_root;};
   const string GetContent() const override;
   private:
   DynamicJsonDocument m_JSONBuffer;
@@ -87,8 +87,8 @@ class AsyncWebServerRequest : public http_resource{
     const std::shared_ptr<http_response> render_GET(const http_request&) override;
     const std::shared_ptr<http_response> render_POST(const http_request&) override;
     void send(int status);
-    void send(AsyncJsonResponse response);
-    void send(AsyncWebServerResponse response);
+    void send(AsyncJsonResponse* response);
+    void send(AsyncWebServerResponse* response);
     void onDisconnect (ArDisconnectHandler fn) {};//TODO
     AsyncWebServerResponse *beginResponse(int code);
     AsyncWebHeader* getHeader(const String& name);
