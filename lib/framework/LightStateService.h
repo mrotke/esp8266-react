@@ -6,6 +6,7 @@
 #ifndef LINUX
 #include <MqttPubSub.h>
 #include <WebSocketTxRx.h>
+#include <LightMqttSettingsService.h>
 #endif
 
 #define LED_PIN 2
