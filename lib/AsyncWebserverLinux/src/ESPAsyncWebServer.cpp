@@ -184,10 +184,10 @@ const std::shared_ptr<http_response> AsyncWebServerJSONRequest::render_POST(cons
     m_params = req.get_args();
     if (m_JSONfunPOST)
     {
-        string content = req.get_content();
-        DynamicJsonDocument doc(content.length() + 1);
+        String content = String(req.get_content().c_str());
+        DynamicJsonDocument doc(1024);
 
-        deserializeJson(doc , content.c_str());
+        deserializeJson(doc , content);
 
         JsonVariant variant = doc.as<JsonVariant>();
         m_JSONfunPOST(this, variant);
@@ -216,7 +216,7 @@ const string AsyncJsonResponse::GetContent() const
 {
     string str;
 
-    serializeJson(m_JSONBuffer, str);
+    serializeJson(m_root, str);
 
     return str;
 }

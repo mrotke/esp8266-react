@@ -46,9 +46,6 @@ class HttpGetEndpoint {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, _bufferSize);
     JsonObject jsonObject = response->getRoot().to<JsonObject>();
     _statefulService->read(jsonObject, _stateReader);
-    #ifdef LINUX
-    response->getRoot() = jsonObject;
-    #endif
     response->setLength();
     request->send(response);
   }
@@ -120,9 +117,6 @@ class HttpPostEndpoint {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, _bufferSize);
     jsonObject = response->getRoot().to<JsonObject>();
     _statefulService->read(jsonObject, _stateReader);
-    #ifdef LINUX
-    response->getRoot() = jsonObject;
-    #endif
     response->setLength();
     request->send(response);
   }
