@@ -1,4 +1,8 @@
 #include <SystemStatus.h>
+#if defined(LINUX)
+#include <sys/utsname.h>
+#include <sys/sysinfo.h>
+#endif
 
 SystemStatus::SystemStatus(AsyncWebServer* server, SecurityManager* securityManager) {
   server->on(SYSTEM_STATUS_SERVICE_PATH,
@@ -19,6 +23,15 @@ void SystemStatus::systemStatus(AsyncWebServerRequest* request) {
   root["esp_platform"] = "esp8266";
   root["max_alloc_heap"] = ESP.getMaxFreeBlockSize();
   root["heap_fragmentation"] = ESP.getHeapFragmentation();
+#elif defined(LINUX)
+  struct utsname unameData;
+  struct sysinfo sysData;
+  uname(&unameData);
+  sysinfo(&sysData);
+  root["platform"] = unameData.sysname;
+  root["cpu_arch"] = unameData.machine;
+  root["total_ram"] = sysData.totalram;
+  root["free_ram"] = sysData.freeram;
 #endif
 #if defined(ESP32) || defined(ESP8266)
   root["cpu_freq_mhz"] = ESP.getCpuFreqMHz();
