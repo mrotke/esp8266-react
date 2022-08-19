@@ -1,6 +1,7 @@
  #include <ESP8266React.h>
  #include <LightMqttSettingsService.h>
  #include <LightStateService.h>
+ #include <Drivers/DriverGpio/DriverGpio.h>
 
 #define SERIAL_BAUD_RATE 115200
 
@@ -25,7 +26,7 @@ LightStateService lightStateService = LightStateService(&server,
                                                         &lightMqttSettingsService
                                                         #endif
                                                         );
-
+DriverGpio driverGpio(&server, esp8266React.getFS(), 1);
 void setup() {
 #ifndef LINUX
   // start serial and filesystem

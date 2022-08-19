@@ -10,7 +10,7 @@
 Driver::Driver(uint16_t id):
 m_id(id)
 {
-	_httpPath = "/rest/driver/" + id;
+	_httpPath = "/rest/driver/" + String(id);
 	_FSPath = _httpPath + ".json";
 }
 

@@ -46,6 +46,7 @@ class DriverGpio:public  StatefulService<DriverGpioSettings>, public Driver {
 public:
 	DriverGpio(AsyncWebServer* server, FS* fs,uint16_t id);
 	virtual ~DriverGpio();
+	eDriverType GetType() const override;
 private:
 	void onConfigUpdated();
 

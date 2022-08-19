@@ -9,14 +9,18 @@
 
 DriverGpio::DriverGpio(AsyncWebServer* server, FS* fs,uint16_t id):
 Driver(id),
-_httpEndpoint(DriverGpioSettings::read, DriverGpioSettings::update, this, server, Driver::GetHttpPath(), this),
-_FSPersistance(DriverGpioSettings::read, DriverGpioSettings::update, this, fs, Driver::GetFSJSON())
+_httpEndpoint(DriverGpioSettings::read, DriverGpioSettings::update, this, server, Driver::GetHttpPath()),
+_FSPersistance(DriverGpioSettings::read, DriverGpioSettings::update, this, fs, Driver::GetFSJSON().c_str())
 {
 
 }
 
 DriverGpio::~DriverGpio() {
 	// TODO Auto-generated destructor stub
+}
+
+DriverGpio::eDriverType DriverGpio::GetType() const {
+	return eDriverType::eDriverGpio;
 }
 
 void DriverGpio::onConfigUpdated() {

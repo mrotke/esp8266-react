@@ -16,13 +16,13 @@ class DriverManager {
 public:
 	~DriverManager();
 	static DriverManager& GetInstance();
-	void AddDriver(Driver* drv);
+	void AddDriver(std::shared_ptr<Driver> drv);
 	void RemoveDriver(uint16_t driver_id);
 private:
 	DriverManager();
 
 	static DriverManager m_instance;
-	std::vector<Driver*> m_drivers;
+	std::vector<std::shared_ptr<Driver>> m_drivers;
 };
 
 #endif /* ESP8266_REACT_LIB_FRAMEWORK_DRIVERS_DRIVERMANAGER_H_ */
