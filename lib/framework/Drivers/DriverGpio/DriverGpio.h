@@ -42,7 +42,7 @@ public:
 	bool state = false;
 };
 
-class DriverGpio:public  StatefulService<DriverGpioSettings>, public Driver {
+class DriverGpio:public StatefulService<DriverGpioSettings>, public Driver {
 public:
 	DriverGpio(AsyncWebServer* server, FS* fs,uint16_t id);
 	virtual ~DriverGpio();

@@ -26,6 +26,8 @@ public:
 
 	virtual eDriverType GetType() const = 0;
 
+	const char* GetTypeName();
+
 	string GetName() const;
 
 	uint16_t getId() const {

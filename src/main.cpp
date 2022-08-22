@@ -1,7 +1,8 @@
  #include <ESP8266React.h>
  #include <LightMqttSettingsService.h>
  #include <LightStateService.h>
- #include <Drivers/DriverGpio/DriverGpio.h>
+ #include "Drivers/DriverManager.h"
+ #include "Drivers/DriversFactory.h"
 
 #define SERIAL_BAUD_RATE 115200
 
@@ -14,6 +15,8 @@ AsyncWebServer server(8080);
 #endif
 
 ESP8266React esp8266React(&server);
+std::shared_ptr<DriverManager> drvManager= std::make_shared<DriverManager>(&server, esp8266React.getFS());
+
 #ifndef LINUX
 LightMqttSettingsService lightMqttSettingsService =
     LightMqttSettingsService(&server, esp8266React.getFS(), esp8266React.getSecurityManager());
@@ -26,12 +29,15 @@ LightStateService lightStateService = LightStateService(&server,
                                                         &lightMqttSettingsService
                                                         #endif
                                                         );
-DriverGpio driverGpio(&server, esp8266React.getFS(), 1);
+//DriverGpio driverGpio(&server, esp8266React.getFS(), 1);
 void setup() {
 #ifndef LINUX
   // start serial and filesystem
   Serial.begin(SERIAL_BAUD_RATE);
 #endif
+  DriverManager::CreateInstance(drvManager);
+  DriverManager::GetInstance()->AddDriver(DriversFactory::GetInstance().CreateDriver(1, "DriverGpio"));
+  DriverManager::GetInstance()->AddDriver(DriversFactory::GetInstance().CreateDriver(2, "DriverGpio"));
   // start the framework and demo project
   esp8266React.begin();
 
