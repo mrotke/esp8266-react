@@ -7,10 +7,20 @@
 
 #include "DriverGpio.h"
 
-DriverGpio::DriverGpio(AsyncWebServer* server, FS* fs,uint16_t id):
+DriverGpio::DriverGpio(AsyncWebServer* server, FS* fs, SecurityManager* sm,uint16_t id):
 Driver(id),
-_httpEndpoint(DriverGpioSettings::read, DriverGpioSettings::update, this, server, Driver::GetHttpPath()),
-_FSPersistance(DriverGpioSettings::read, DriverGpioSettings::update, this, fs, Driver::GetFSJSON().c_str())
+_httpEndpoint(DriverGpioSettings::read,
+			  DriverGpioSettings::update,
+			  this,
+			  server,
+			  Driver::GetHttpPath(),
+			  sm,
+			  AuthenticationPredicates::IS_AUTHENTICATED),
+_FSPersistance(DriverGpioSettings::read,
+		       DriverGpioSettings::update,
+			   this,
+			   fs,
+			   Driver::GetFSJSON().c_str())
 {
 
 }

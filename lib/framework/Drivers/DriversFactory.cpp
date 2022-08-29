@@ -24,8 +24,9 @@ std::shared_ptr<Driver> DriversFactory::CreateDriver(uint16_t id, const char *na
 	{
 		AsyncWebServer* server = manager->getServer();
 		FS* fs = manager->getFS();
+		SecurityManager* sm = manager->GetSM();
 	#define DEF_DRIVER(etype, className, Typename) if ( strcmp(name, Typename) == 0 ) \
-		 return(std::shared_ptr<Driver>(new className(server, fs, id)));
+		 return(std::shared_ptr<Driver>(new className(server, fs, sm, id)));
 	#include "DriverMacro.h"
 	#undef DEF_DRIVER
 	}

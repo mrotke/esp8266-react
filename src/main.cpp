@@ -15,7 +15,7 @@ AsyncWebServer server(8080);
 #endif
 
 ESP8266React esp8266React(&server);
-std::shared_ptr<DriverManager> drvManager= std::make_shared<DriverManager>(&server, esp8266React.getFS());
+std::shared_ptr<DriverManager> drvManager= std::make_shared<DriverManager>(&server, esp8266React.getFS(),esp8266React.getSecurityManager());
 
 #ifndef LINUX
 LightMqttSettingsService lightMqttSettingsService =
