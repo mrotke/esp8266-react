@@ -36,8 +36,7 @@ void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
 #endif
   DriverManager::CreateInstance(drvManager);
-  DriverManager::GetInstance()->AddDriver(DriversFactory::GetInstance().CreateDriver(1, "DriverGpio"));
-  DriverManager::GetInstance()->AddDriver(DriversFactory::GetInstance().CreateDriver(2, "DriverGpio"));
+  DriverManager::GetInstance()->Begin();
   // start the framework and demo project
   esp8266React.begin();
 

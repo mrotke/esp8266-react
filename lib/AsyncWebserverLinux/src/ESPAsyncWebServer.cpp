@@ -26,6 +26,11 @@ void AsyncWebServer::begin()
     
 }
 
+void AsyncWebServerRequest::onDisconnect (ArDisconnectHandler fn)
+{
+	m_funDisc = fn;
+}
+
 void AsyncWebServer::on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest)
 {
     bool requestExist = false;
@@ -145,6 +150,8 @@ const std::shared_ptr<http_response> AsyncWebServerRequest::render_POST(const ht
     m_headers = req.get_headers();
     m_params = req.get_args();
     m_funPOST(this);
+    if (m_funDisc)
+    	m_funDisc();
     return m_response;
 }
 
@@ -197,6 +204,8 @@ const std::shared_ptr<http_response> AsyncWebServerJSONRequest::render_POST(cons
         m_funPOST(this);
     }
 
+    if (m_funDisc)
+    	m_funDisc();
 
     return m_response;
 }

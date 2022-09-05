@@ -102,10 +102,10 @@ StateUpdateResult DriverManagerSettings::update(JsonObject &root,DriverManagerSe
 StateUpdateResult DriverManagerSettings::updateFromFS(JsonObject &root,DriverManagerSettings &State) {
 	if (root.containsKey("drivers"))
 	{
-		JsonArray drivers = root["drivers"].to<JsonArray>();
+		JsonArray drivers = root["drivers"].as<JsonArray>();
 		for(JsonVariant v : drivers)
 		{
-			JsonObject driver = v.to<JsonObject>();
+			JsonObject driver = v.as<JsonObject>();
 			uint16_t id = driver["id"];
 			std::shared_ptr<DriverManager> manager = DriverManager::GetInstance();
 			if(manager)

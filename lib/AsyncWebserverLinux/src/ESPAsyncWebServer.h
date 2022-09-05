@@ -89,7 +89,7 @@ class AsyncWebServerRequest : public http_resource{
     void send(int status);
     void send(AsyncJsonResponse* response);
     void send(AsyncWebServerResponse* response);
-    void onDisconnect (ArDisconnectHandler fn) {};//TODO
+    void onDisconnect (ArDisconnectHandler fn);
     AsyncWebServerResponse *beginResponse(int code);
     AsyncWebHeader* getHeader(const String& name);
     bool hasParam(const String& name);
@@ -100,6 +100,7 @@ class AsyncWebServerRequest : public http_resource{
     shared_ptr<http_response> m_response = nullptr;
     ArRequestHandlerFunction m_funGET = nullptr;
     ArRequestHandlerFunction m_funPOST = nullptr;
+    ArDisconnectHandler m_funDisc = nullptr;
     map<string, string, http::header_comparator> m_headers;
     map<string, string, http::arg_comparator> m_params;
   private:
