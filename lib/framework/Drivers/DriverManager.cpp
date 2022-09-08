@@ -40,7 +40,7 @@ _httpEndpoint(DriverManagerSettings::read,
 			  "/rest/driverManager",
 			  sm,
 			  AuthenticationPredicates::IS_AUTHENTICATED),
-_FSPersistance(DriverManagerSettings::read, DriverManagerSettings::updateFromFS, this, fs, "drivermanager.json")
+_FSPersistance(DriverManagerSettings::readFS, DriverManagerSettings::updateFromFS, this, fs, "drivermanager.json")
 {
 
 }
@@ -78,21 +78,50 @@ void DriverManagerSettings::read(DriverManagerSettings &settings,JsonObject &roo
 	}
 }
 
+void DriverManagerSettings::readFS(DriverManagerSettings &settings,JsonObject &root) {
+	// allocate the memory for the document
+	DynamicJsonDocument doc(128);
+
+	JsonArray drivers = root.createNestedArray("drivers");
+	// create an object
+	JsonObject driver = doc.to<JsonObject>();
+
+	std::shared_ptr<DriverManager> manager = DriverManager::GetInstance();
+	if(manager)
+	{
+		for (auto drv : manager->m_drivers)
+		{
+			driver["id"] = drv->getId();
+			driver["type"] = drv->GetName();
+			drivers.add(driver);
+		}
+	}
+}
+
 StateUpdateResult DriverManagerSettings::update(JsonObject &root,DriverManagerSettings &State) {
 	if (root.containsKey("drivers"))
 	{
 		JsonArray drivers = root["drivers"].as<JsonArray>();
 		for(auto v : drivers)
 		{
+			string action;
 			JsonObject driver = v.as<JsonObject>();
 			uint16_t id = driver["id"];
+			if (driver.containsKey("action") && driver["action"].is<string>())
+			{
+				action = driver["action"].as<string>();;
+			}
 			std::shared_ptr<DriverManager> manager = DriverManager::GetInstance();
 			if(manager)
 			{
 				manager->RemoveDriver(id);
-				String name = driver["type"];
-				std::shared_ptr<Driver> drv = DriversFactory::GetInstance().CreateDriver(id, name.c_str());
-				manager->AddDriver(drv);
+				if (action.compare("delete") != 0)
+				{
+					String name = driver["type"];
+					std::shared_ptr<Driver> drv = DriversFactory::GetInstance().CreateDriver(id, name.c_str());
+					manager->AddDriver(drv);
+				}
+
 			}
 		}
 	}

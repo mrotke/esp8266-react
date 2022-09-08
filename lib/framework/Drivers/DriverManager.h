@@ -18,6 +18,8 @@ class DriverManagerSettings{
 public:
 	static void read(DriverManagerSettings& settings, JsonObject& root);
 
+	static void readFS(DriverManagerSettings& settings, JsonObject& root);
+
 	static StateUpdateResult update(JsonObject& root, DriverManagerSettings& State);
 
 	static StateUpdateResult updateFromFS(JsonObject& root, DriverManagerSettings& State);
